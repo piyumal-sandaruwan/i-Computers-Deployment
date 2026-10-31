@@ -1,35 +1,22 @@
+
 services:
   backend:
-    build:
-      context: ../i-Computers-BackEnd
-      dockerfile: Dockerfile
+    image: ghcr.io/piyumal-sandaruwan/i-computers-backend:latest
     container_name: icomputers-backend
     restart: unless-stopped
     env_file:
       - backend.env
     ports:
-
-      # - "127.0.0.1:3000:3000"
-      - "3000:3000"
+      - "127.0.0.1:3000:3000"
     networks:
       - icomputers-network
 
   frontend:
-    build:
-      context: ../i-Computers-FrontEnd
-      dockerfile: Dockerfile
-      args:
-        VITE_BACKEND_URL: ${VITE_BACKEND_URL}
-        VITE_GOOGLE_CLIENT_ID: ${VITE_GOOGLE_CLIENT_ID}
-        VITE_SUPABASE_URL: ${VITE_SUPABASE_URL}
-        VITE_SUPABASE_KEY: ${VITE_SUPABASE_KEY}
+    image: ghcr.io/piyumal-sandaruwan/i-computers-frontend:latest
     container_name: icomputers-frontend
     restart: unless-stopped
     ports:
-      # - "127.0.0.1:8080:80"
-        - "8080:80"
-    depends_on:
-      - backend
+      - "127.0.0.1:8080:80"
     networks:
       - icomputers-network
 
