@@ -1,7 +1,7 @@
 
 services:
   backend:
-    image: ghcr.io/piyumal-sandaruwan/i-computers-backend:latest
+    image: icomputersacr-e3c6a6aue2d2b2da.azurecr.io/i-computers-backend:latest
     container_name: icomputers-backend
     restart: unless-stopped
     env_file:
@@ -12,11 +12,13 @@ services:
       - icomputers-network
 
   frontend:
-    image: ghcr.io/piyumal-sandaruwan/i-computers-frontend:latest
+    image: icomputersacr-e3c6a6aue2d2b2da.azurecr.io/i-computers-frontend:latest
     container_name: icomputers-frontend
     restart: unless-stopped
     ports:
       - "127.0.0.1:8080:80"
+    depends_on:
+      - backend
     networks:
       - icomputers-network
 

@@ -1,3 +1,4 @@
+
 name: i-Computers Deployment
 
 on:
@@ -13,31 +14,37 @@ jobs:
     steps:
       - name: Deploy application
         uses: appleboy/ssh-action@v1.2.2
-        env:
-          GHCR_USERNAME: ${{ secrets.GHCR_USERNAME }}
-          GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
         with:
           host: ${{ secrets.AZURE_VM_HOST }}
           username: ${{ secrets.AZURE_VM_USERNAME }}
           key: ${{ secrets.AZURE_VM_SSH_KEY }}
-          envs: GHCR_USERNAME,GHCR_TOKEN
           script: |
             set -e
 
             cd /opt/icomputers/deployment
 
-            echo "$GHCR_TOKEN" | docker login ghcr.io \
-              -u "$GHCR_USERNAME" --password-stdin
+            echo "Updating deployment configuration..."
+            git pull --ff-only origin main
 
+            echo "Authenticating with Azure Managed Identity..."
+            az login --identity
+
+            echo "Logging into Azure Container Registry..."
+            az acr login --name icomputersacr
+
+            echo "Pulling latest Docker images..."
             docker compose pull
 
+            echo "Restarting application..."
             docker compose up -d --remove-orphans
 
+            echo "Removing unused Docker images..."
             docker image prune -f
 
+            echo "Checking container status..."
             docker compose ps
 
-            docker logout ghcr.io
+            echo "Deployment completed!"
 
       - name: Deployment completed
         run: echo "i-Computers deployment completed successfully!"
